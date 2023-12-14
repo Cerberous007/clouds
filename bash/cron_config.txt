@@ -1,0 +1,15 @@
+#
+# To define the time you can provide concrete values for
+# minute (m), hour (h), day of month (dom), month (mon),
+# and day of week (dow) or use '*' in these fields (for 'any').#
+# Notice that tasks will be started based on the cron's system
+# daemon's notion of time and timezones.
+#
+# Output of the crontab jobs (including errors) is sent through
+# email to the user the crontab file belongs to (unless redirected).
+
+16 03 * * * PYTHONPATH=/home/d.kurlov/contact-center-dataflow /home/d.kurlov/contact-center-dataflow/bash/populate_contact_center_usedesk_tickets.sh >> /home/d.kurlov/contact-center-dataflow/logs/created_tickets
+
+19 03 * * * PYTHONPATH=/home/d.kurlov/contact-center-dataflow /home/d.kurlov/contact-center-dataflow/bash/populate_contact_center_usedesk_messages.sh >> /home/d.kurlov/contact-center-dataflow/logs/created_messages
+
+09 06 * * PYTHONPATH=/home/d.kurlov/contact-center-dataflow /home/d.kurlov/contact-center-dataflow/bash/make_forecast_monthly.sh >> /home/d.kurlov/contact-center-dataflow/logs/make_forecast_monthly

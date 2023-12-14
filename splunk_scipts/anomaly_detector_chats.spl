@@ -1,0 +1,22 @@
+|dbxquery connection="presto" maxrows=0 timeout=40000 [makeresults | addinfo  | eval query="with 
+dt_sum as(
+	select date(created_at) as dt, avg(is_automatized) as percent_automatized
+    from lookup.dashboards.abelkova_cc_buttons_wide_all_categories  
+    group by date(created_at)
+),
+dt_window_sum as(
+	select *, 
+	row_number() over(order by dt ROWS 9 PRECEDING) -9 as window_num,
+	avg(percent_automatized) over(order by dt ROWS 9 PRECEDING) as window_avg,
+	stddev_samp(percent_automatized) over(order by dt ROWS 9 PRECEDING) as window_std
+	from dt_sum
+	)
+select dt, percent_automatized, window_avg - 1.9 * window_std as lowerBound, window_avg + 1.9 * window_std as upperBound, window_avg from dt_window_sum
+where window_num >0
+"| return query]
+| eval _time = dt
+| eval _time = strptime(_time, "%Y-%m-%d")
+| eval isOutlier=if(percent_automatized > upperBound OR percent_automatized < lowerBound, 1, 0)
+| addinfo
+| where _time >= info_min_time and _time < info_max_time
+| table _time, percent_automatized, lowerBound, upperBound, isOutlier
